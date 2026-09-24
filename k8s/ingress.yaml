@@ -1,0 +1,58 @@
+# Resume AI Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: resume-ai-ingress
+
+  annotations:
+    # Use Let's Encrypt to create the SSL certificate
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+
+    # Redirect HTTP traffic to HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+spec:
+  # Use NGINX Ingress Controller
+  ingressClassName: nginx
+
+  # HTTPS / SSL configuration
+  tls:
+  - hosts:
+    # Main website
+    - venugopalareddy.in
+
+    # Backend API
+    - api.venugopalareddy.in
+    # Kubernetes Secret containing the TLS certificate
+    secretName: resume-ai-tls
+
+  rules:
+
+  # Main website → Frontend
+  - host: venugopalareddy.in
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+
+        # Send traffic to frontend service
+        backend:
+          service:
+            name: resume-ai-frontend
+            port:
+              number: 80
+
+  # API domain → Backend
+  - host: api.venugopalareddy.in
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+
+        # Send traffic to backend service
+        backend:
+          service:
+            name: resume-ai-backend
+            port:
+              number: 8000

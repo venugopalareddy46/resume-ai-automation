@@ -1,0 +1,21 @@
+# Backend Service
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: resume-ai-backend
+  labels:
+    app: resume-ai-backend
+
+spec:
+  # Connect to backend Pods
+  selector:
+    app: resume-ai-backend
+
+  # Backend service port
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  # Internal access only
+  type: ClusterIP

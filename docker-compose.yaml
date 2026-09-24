@@ -1,0 +1,49 @@
+services:
+
+  # ==========================================
+  # BACKEND - FastAPI
+  # ==========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: resume-ai-backend
+
+    # Load environment variables from backend/.env
+    env_file:
+      - ./backend/.env
+
+    # Host:Container
+    ports:
+      - "8000:8000"
+
+    # Automatically restart unless manually stopped
+    restart: unless-stopped
+
+
+  # ==========================================
+  # FRONTEND - React/Vite + Nginx
+  # ==========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+      # Vite variables are required during npm run build
+      args:
+        VITE_API_BASE_URL: http://localhost:8000
+
+    container_name: resume-ai-frontend
+
+    # Host:Container
+    # Browser: localhost:5173
+    # Nginx: port 80
+    ports:
+      - "5173:80"
+
+    restart: unless-stopped
+
+    # Start backend before frontend
+    depends_on:
+      - backend

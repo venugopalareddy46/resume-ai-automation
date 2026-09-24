@@ -1,0 +1,66 @@
+# Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: resume-ai-backend
+  labels:
+    app: resume-ai-backend
+
+spec:
+  # Run 2 backend Pods
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: resume-ai-backend
+
+  template:
+    metadata:
+      labels:
+        app: resume-ai-backend
+
+    spec:
+      containers:
+      - name: backend
+
+        # Backend Docker image
+        image: venugopalareddy/resume-ai-backend:2.0
+        imagePullPolicy: IfNotPresent
+
+        # FastAPI port
+        ports:
+        - containerPort: 8000
+        # Load ConfigMap and Secret
+        envFrom:
+        # Application configuration
+        - configMapRef:
+            name: resume-ai-backend-config
+
+        # Sensitive configuration
+        - secretRef:
+            name: resume-ai-backend-secret
+        # CPU and memory
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
+        # Check if application is ready
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+
+        # Check if application is alive
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 20
+          periodSeconds: 20

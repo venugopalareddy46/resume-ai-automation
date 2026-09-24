@@ -1,0 +1,26 @@
+# Let's Encrypt Production ClusterIssuer
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+
+metadata:
+  # ClusterIssuer name used by the Ingress
+  name: letsencrypt-prod
+
+spec:
+  acme:
+    # Email used by Let's Encrypt for certificate notifications
+    email: YOUR_EMAIL@example.com
+
+    # Let's Encrypt production ACME server
+    server: https://acme-v02.api.letsencrypt.org/directory
+
+    # Secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-prod
+
+    # HTTP-01 challenge configuration
+    solvers:
+    - http01:
+        ingress:
+          # Use NGINX Ingress Controller
+          ingressClassName: nginx
